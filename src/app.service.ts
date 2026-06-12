@@ -11,18 +11,4 @@ export class AppService {
       status: 'healthy',
     };
   }
-
-  getAbout() {
-    return {
-      project: 'Synapse',
-      version: '1.0.0',
-    };
-  }
-
-  getStatus() {
-    return {
-      server: 'running',
-      project: 'Synapse',
-    };
-  }
 }

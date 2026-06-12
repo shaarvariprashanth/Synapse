@@ -7,7 +7,10 @@ import { JwtAuthGuard } from './auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller({
+  path: 'auth',
+  version: '1',
+})
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @ApiOperation({ summary: 'Register a new user' })

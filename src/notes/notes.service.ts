@@ -34,4 +34,12 @@ export class NotesService {
 
     return this.notesRepository.save(note);
   }
+
+  async deleteNote(id: number) {
+    const result = await this.notesRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Note not found');
+    }
+  }
 }

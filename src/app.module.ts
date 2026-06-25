@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { validationSchema } from './config/env.validation';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { validationSchema } from './config/env.validation';
         synchronize: true,
       }),
     }),
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

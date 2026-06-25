@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Note } from './notes.entity';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 
 @Injectable()
 export class NotesService {
@@ -17,6 +18,19 @@ export class NotesService {
 
   async createNote(createNoteDto: CreateNoteDto) {
     const note = this.notesRepository.create(createNoteDto);
+
+    return this.notesRepository.save(note);
+  }
+
+  async updateNote(id: number, updateNoteDto: UpdateNoteDto) {
+    const note = await this.notesRepository.preload({
+      id,
+      ...updateNoteDto,
+    });
+
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
 
     return this.notesRepository.save(note);
   }

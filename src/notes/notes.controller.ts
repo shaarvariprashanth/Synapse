@@ -1,6 +1,15 @@
-import { Controller, Get, Body, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Post,
+  Param,
+  Patch,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 
 @Controller({
   path: 'notes',
@@ -17,5 +26,16 @@ export class NotesController {
   @Post()
   create(@Body() createNoteDto: CreateNoteDto) {
     return this.notesService.createNote(createNoteDto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe)
+    id: number,
+
+    @Body()
+    updateNoteDto: UpdateNoteDto,
+  ) {
+    return this.notesService.updateNote(id, updateNoteDto);
   }
 }

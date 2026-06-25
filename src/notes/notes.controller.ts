@@ -8,10 +8,13 @@ import {
   ParseIntPipe,
   HttpCode,
   Delete,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller({
   path: 'notes',
@@ -21,13 +24,15 @@ export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
   @Get()
-  getAllNotes() {
-    return this.notesService.getAllNotes();
+  @UseGuards(JwtAuthGuard)
+  getAllNotes(@Request() req) {
+    return this.notesService.getAllNotes(req.user.id);
   }
 
   @Post()
-  create(@Body() createNoteDto: CreateNoteDto) {
-    return this.notesService.createNote(createNoteDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
+    return this.notesService.createNote(createNoteDto, req.user.id);
   }
 
   @Patch(':id')

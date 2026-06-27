@@ -111,10 +111,9 @@ export class NotesService {
     const note = await this.notesRepository.findOne({
       where: {
         id: noteId,
-        user: {
-          id: userId,
-        },
+        user: { id: userId },
       },
+      withDeleted: true,
     });
 
     if (!note) {

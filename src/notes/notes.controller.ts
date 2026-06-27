@@ -16,6 +16,7 @@ import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ApiResponseDto } from 'src/common/dto/api-response.dto';
 
 @Controller({
   path: 'notes',
@@ -26,18 +27,19 @@ export class NotesController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  getAllNotes(
+  async getAllNotes(
     @Request() req,
 
     @Query('page') page = '1',
 
     @Query('limit') limit = '10',
   ) {
-    return this.notesService.getAllNotes(
+    const notes = await this.notesService.getAllNotes(
       req.user.id,
       Number(page),
       Number(limit),
     );
+    return new ApiResponseDto('Notes retrieved successfully', notes);
   }
 
   @Get('tag/:tag')
@@ -48,8 +50,9 @@ export class NotesController {
 
   @Get('search')
   @UseGuards(JwtAuthGuard)
-  searchNotes(@Query('query') query: string, @Request() req) {
-    return this.notesService.searchNotes(query, req.user.id);
+  async searchNotes(@Query('query') query: string, @Request() req) {
+    const notes = await this.notesService.searchNotes(query, req.user.id);
+    return new ApiResponseDto('Search completed successfully', notes);
   }
 
   @Get('deleted')
@@ -60,8 +63,12 @@ export class NotesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
-    return this.notesService.createNote(createNoteDto, req.user.id);
+  async create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
+    const notes = await this.notesService.createNote(
+      createNoteDto,
+      req.user.id,
+    );
+    return new ApiResponseDto('Note created successfully', notes);
   }
 
   @Patch(':id')
@@ -81,26 +88,28 @@ export class NotesController {
 
   @Patch('restore/:id')
   @UseGuards(JwtAuthGuard)
-  restore(
+  async restore(
     @Param('id', ParseIntPipe)
     id: number,
 
     @Request()
     req,
   ) {
-    return this.notesService.restoreNote(id, req.user.id);
+    await this.notesService.restoreNote(id, req.user.id);
+    return new ApiResponseDto('Note restored successfully', null);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  remove(
+  async remove(
     @Param('id', ParseIntPipe)
     id: number,
 
     @Request()
     req,
   ) {
-    return this.notesService.deleteNote(id, req.user.id);
+    await this.notesService.deleteNote(id, req.user.id);
+    return new ApiResponseDto('Note deleted successfully', null);
   }
 }

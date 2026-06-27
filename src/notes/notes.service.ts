@@ -78,4 +78,13 @@ export class NotesService {
       ],
     });
   }
+
+  async getNotesByTag(tag: string, userId: number) {
+    return this.notesRepository
+      .createQueryBuilder('note')
+      .where(':tag = ANY(note.tags)', { tag })
+      .andWhere('note.userId = :userId', { userId })
+      .orderBy('note.createdAt', 'DESC')
+      .getMany();
+  }
 }

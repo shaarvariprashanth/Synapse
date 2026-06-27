@@ -40,6 +40,12 @@ export class NotesController {
     );
   }
 
+  @Get('tag/:tag')
+  @UseGuards(JwtAuthGuard)
+  getNotesByTag(@Param('tag') tag: string, @Request() req) {
+    return this.notesService.getNotesByTag(tag, req.user.id);
+  }
+
   @Get('search')
   @UseGuards(JwtAuthGuard)
   searchNotes(@Query('query') query: string, @Request() req) {

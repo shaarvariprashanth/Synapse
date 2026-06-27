@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Note } from './notes.entity';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -50,5 +50,24 @@ export class NotesService {
     if (result.affected === 0) {
       throw new NotFoundException('Note not found');
     }
+  }
+
+  async searchNotes(query: string, userId: number) {
+    return this.notesRepository.find({
+      where: [
+        {
+          title: ILike(`%${query}%`),
+          user: {
+            id: userId,
+          },
+        },
+        {
+          content: ILike(`%${query}%`),
+          user: {
+            id: userId,
+          },
+        },
+      ],
+    });
   }
 }

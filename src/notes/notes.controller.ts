@@ -10,6 +10,7 @@ import {
   Delete,
   Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -27,6 +28,12 @@ export class NotesController {
   @UseGuards(JwtAuthGuard)
   getAllNotes(@Request() req) {
     return this.notesService.getAllNotes(req.user.id);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  searchNotes(@Query('query') query: string, @Request() req) {
+    return this.notesService.searchNotes(query, req.user.id);
   }
 
   @Post()

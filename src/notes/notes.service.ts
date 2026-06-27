@@ -14,12 +14,20 @@ export class NotesService {
     private usersService: UsersService,
   ) {}
 
-  async getAllNotes(userId: number) {
+  async getAllNotes(userId: number, page: number, limit: number) {
     return this.notesRepository.find({
       where: {
         user: {
           id: userId,
         },
+      },
+
+      skip: (page - 1) * limit,
+
+      take: limit,
+
+      order: {
+        createdAt: 'DESC',
       },
     });
   }

@@ -26,8 +26,18 @@ export class NotesController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  getAllNotes(@Request() req) {
-    return this.notesService.getAllNotes(req.user.id);
+  getAllNotes(
+    @Request() req,
+
+    @Query('page') page = '1',
+
+    @Query('limit') limit = '10',
+  ) {
+    return this.notesService.getAllNotes(
+      req.user.id,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get('search')

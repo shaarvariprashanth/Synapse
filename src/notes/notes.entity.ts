@@ -27,4 +27,10 @@ export class Note {
 
   @ManyToOne(() => User, (user) => user.notes)
   user!: User;
+
+  @Column('text', {
+    array: true,
+    default: [],
+  })
+  tags!: string[];
 }

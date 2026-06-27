@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsArray, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateNoteDto {
@@ -14,4 +14,15 @@ export class CreateNoteDto {
   })
   @IsNotEmpty()
   content!: string;
+
+  @ApiProperty({
+    example: ['Backend', 'Authentication'],
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({
+    each: true,
+  })
+  tags?: string[];
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, IsNull, Not } from 'typeorm';
 import { Note } from './notes.entity';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -53,7 +53,7 @@ export class NotesService {
   }
 
   async deleteNote(id: number) {
-    const result = await this.notesRepository.delete(id);
+    const result = await this.notesRepository.softDelete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException('Note not found');
@@ -86,5 +86,21 @@ export class NotesService {
       .andWhere('note.userId = :userId', { userId })
       .orderBy('note.createdAt', 'DESC')
       .getMany();
+  }
+
+  async getDeletedNotes(userId: number) {
+    return this.notesRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+        deletedAt: Not(IsNull()),
+      },
+      withDeleted: true,
+    });
+  }
+
+  async restoreNote(id: number) {
+    await this.notesRepository.restore(id);
   }
 }

@@ -52,6 +52,12 @@ export class NotesController {
     return this.notesService.searchNotes(query, req.user.id);
   }
 
+  @Get('deleted')
+  @UseGuards(JwtAuthGuard)
+  getDeletedNotes(@Request() req) {
+    return this.notesService.getDeletedNotes(req.user.id);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
@@ -67,6 +73,14 @@ export class NotesController {
     updateNoteDto: UpdateNoteDto,
   ) {
     return this.notesService.updateNote(id, updateNoteDto);
+  }
+
+  @Patch('restore/:id')
+  restore(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ) {
+    return this.notesService.restoreNote(id);
   }
 
   @Delete(':id')

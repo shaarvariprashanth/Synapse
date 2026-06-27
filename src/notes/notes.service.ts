@@ -39,25 +39,22 @@ export class NotesService {
     return this.notesRepository.save(note);
   }
 
-  async updateNote(id: number, updateNoteDto: UpdateNoteDto) {
-    const note = await this.notesRepository.preload({
-      id,
-      ...updateNoteDto,
-    });
+  async updateNote(id: number, userId: number, updateNoteDto: UpdateNoteDto) {
+    const note = await this.findUserNote(id, userId);
 
-    if (!note) {
-      throw new NotFoundException('Note not found');
-    }
+    Object.assign(note, updateNoteDto);
 
     return this.notesRepository.save(note);
   }
 
-  async deleteNote(id: number) {
-    const result = await this.notesRepository.softDelete(id);
+  async deleteNote(id: number, userId: number) {
+    await this.findUserNote(id, userId);
 
-    if (result.affected === 0) {
-      throw new NotFoundException('Note not found');
-    }
+    await this.notesRepository.softDelete(id);
+
+    return {
+      message: 'Note deleted successfully',
+    };
   }
 
   async searchNotes(query: string, userId: number) {
@@ -100,7 +97,30 @@ export class NotesService {
     });
   }
 
-  async restoreNote(id: number) {
+  async restoreNote(id: number, userId: number) {
+    await this.findUserNote(id, userId);
+
     await this.notesRepository.restore(id);
+
+    return {
+      message: 'Note restored successfully',
+    };
+  }
+
+  private async findUserNote(noteId: number, userId: number) {
+    const note = await this.notesRepository.findOne({
+      where: {
+        id: noteId,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
+
+    return note;
   }
 }

@@ -65,30 +65,42 @@ export class NotesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   update(
     @Param('id', ParseIntPipe)
     id: number,
 
     @Body()
     updateNoteDto: UpdateNoteDto,
+
+    @Request()
+    req,
   ) {
-    return this.notesService.updateNote(id, updateNoteDto);
+    return this.notesService.updateNote(id, req.user.id, updateNoteDto);
   }
 
   @Patch('restore/:id')
+  @UseGuards(JwtAuthGuard)
   restore(
     @Param('id', ParseIntPipe)
     id: number,
+
+    @Request()
+    req,
   ) {
-    return this.notesService.restoreNote(id);
+    return this.notesService.restoreNote(id, req.user.id);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   remove(
     @Param('id', ParseIntPipe)
     id: number,
+
+    @Request()
+    req,
   ) {
-    return this.notesService.deleteNote(id);
+    return this.notesService.deleteNote(id, req.user.id);
   }
 }

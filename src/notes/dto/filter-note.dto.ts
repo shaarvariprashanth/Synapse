@@ -3,6 +3,7 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  IsIn,
 } from 'class-validator';
 
 export class FilterNoteDto {
@@ -21,4 +22,12 @@ export class FilterNoteDto {
   @IsOptional()
   @IsString()
   tag?: string;
+
+  @IsOptional()
+  @IsIn(['title', 'createdAt', 'updatedAt'])
+  sortBy?: string;
+
+  @IsOptional()
+  @IsIn(['ASC', 'DESC', 'asc', 'desc'])
+  order?: string;
 }

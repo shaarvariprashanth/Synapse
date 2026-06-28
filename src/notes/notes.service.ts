@@ -200,6 +200,12 @@ export class NotesService {
       });
     }
 
-    return query.orderBy('note.updatedAt', 'DESC').getMany();
+    const sortBy = filters.sortBy ?? 'updatedAt';
+
+    const order = (filters.order?.toUpperCase() as 'ASC' | 'DESC') ?? 'DESC';
+
+    query.orderBy(`note.${sortBy}`, order);
+
+    return query.getMany();
   }
 }

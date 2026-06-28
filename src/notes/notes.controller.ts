@@ -17,7 +17,9 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiResponseDto } from 'src/common/dto/api-response.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller({
   path: 'notes',
   version: '1',
@@ -97,6 +99,18 @@ export class NotesController {
   ) {
     await this.notesService.restoreNote(id, req.user.id);
     return new ApiResponseDto('Note restored successfully', null);
+  }
+
+  @Patch(':id/favorite')
+  @UseGuards(JwtAuthGuard)
+  async toggleFavorite(
+    @Param('id', ParseIntPipe)
+    id: number,
+
+    @Request()
+    req,
+  ) {
+    return this.notesService.toggleFavorite(id, req.user.id);
   }
 
   @Delete(':id')

@@ -43,4 +43,9 @@ export class Note {
     nullable: true,
   })
   folder!: Folder | null;
+
+  @Column({
+    default: false,
+  })
+  isFavorite!: boolean;
 }

@@ -122,4 +122,12 @@ export class NotesService {
 
     return note;
   }
+
+  async toggleFavorite(noteId: number, userId: number) {
+    const note = await this.findUserNote(noteId, userId);
+
+    note.isFavorite = !note.isFavorite;
+
+    return this.notesRepository.save(note);
+  }
 }

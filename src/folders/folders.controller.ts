@@ -13,6 +13,7 @@ import { FoldersService } from './folders.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { MoveNoteDto } from './dto/move-note.dto';
+import { UpdateFolderDto } from './dto/update-folder.dto';
 
 @Controller({
   path: 'folders',
@@ -51,5 +52,24 @@ export class FoldersController {
       moveNoteDto.noteId,
       req.user.id,
     );
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  async renameFolder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateFolderDto: UpdateFolderDto,
+    @Request() req,
+  ) {
+    return this.foldersService.renameFolder(id, req.user.id, updateFolderDto);
+  }
+
+  @Patch('remove-note/:noteId')
+  @UseGuards(JwtAuthGuard)
+  async removeNoteFromFolder(
+    @Param('noteId', ParseIntPipe) noteId: number,
+    @Request() req,
+  ) {
+    return this.foldersService.removeNoteFromFolder(noteId, req.user.id);
   }
 }

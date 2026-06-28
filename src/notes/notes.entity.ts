@@ -42,5 +42,5 @@ export class Note {
   @ManyToOne(() => Folder, (folder) => folder.notes, {
     nullable: true,
   })
-  folder?: Folder;
+  folder!: Folder | null;
 }

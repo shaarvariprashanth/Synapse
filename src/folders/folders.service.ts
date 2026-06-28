@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { Note } from 'src/notes/notes.entity';
+import { UpdateFolderDto } from './dto/update-folder.dto';
 
 @Injectable()
 export class FoldersService {
@@ -96,5 +97,50 @@ export class FoldersService {
     }
 
     return folder;
+  }
+
+  async renameFolder(
+    folderId: number,
+    userId: number,
+    updateFolderDto: UpdateFolderDto,
+  ) {
+    const folder = await this.foldersRepository.findOne({
+      where: {
+        id: folderId,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    folder.name = updateFolderDto.name;
+
+    return this.foldersRepository.save(folder);
+  }
+
+  async removeNoteFromFolder(noteId: number, userId: number) {
+    const note = await this.notesRepository.findOne({
+      where: {
+        id: noteId,
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        folder: true,
+      },
+    });
+
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
+
+    note.folder = null;
+
+    return this.notesRepository.save(note);
   }
 }

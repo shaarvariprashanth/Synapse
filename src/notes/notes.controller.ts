@@ -130,6 +130,31 @@ export class NotesController {
     return new ApiResponseDto('Note restored successfully', null);
   }
 
+  @Patch('bulk/favorite')
+  @UseGuards(JwtAuthGuard)
+  async favoriteMultiple(@Body() bulkNoteDto: BulkNoteDto, @Request() req) {
+    const notes = await this.notesService.favoriteMultipleNotes(
+      bulkNoteDto.noteIds,
+      req.user.id,
+    );
+
+    return new ApiResponseDto('Notes marked as favorite successfully', notes);
+  }
+
+  @Patch('bulk/unfavorite')
+  @UseGuards(JwtAuthGuard)
+  async unfavoriteMultiple(@Body() bulkNoteDto: BulkNoteDto, @Request() req) {
+    const notes = await this.notesService.unfavoriteMultipleNotes(
+      bulkNoteDto.noteIds,
+      req.user.id,
+    );
+
+    return new ApiResponseDto(
+      'Notes removed from favorites successfully',
+      notes,
+    );
+  }
+
   @Patch(':id/favorite')
   @UseGuards(JwtAuthGuard)
   async toggleFavorite(

@@ -227,4 +227,42 @@ export class NotesService {
 
     return notes;
   }
+
+  async favoriteMultipleNotes(noteIds: number[], userId: number) {
+    const notes = await this.notesRepository.find({
+      where: {
+        id: In(noteIds),
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    for (const note of notes) {
+      note.isFavorite = true;
+    }
+
+    await this.notesRepository.save(notes);
+
+    return notes;
+  }
+
+  async unfavoriteMultipleNotes(noteIds: number[], userId: number) {
+    const notes = await this.notesRepository.find({
+      where: {
+        id: In(noteIds),
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    for (const note of notes) {
+      note.isFavorite = false;
+    }
+
+    await this.notesRepository.save(notes);
+
+    return notes;
+  }
 }

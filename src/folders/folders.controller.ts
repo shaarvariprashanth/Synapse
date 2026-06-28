@@ -33,6 +33,12 @@ export class FoldersController {
     return this.foldersService.getFolders(req.user.id);
   }
 
+  @Get(':id/notes')
+  @UseGuards(JwtAuthGuard)
+  async getFolderNotes(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.foldersService.getFolderNotes(id, req.user.id);
+  }
+
   @Patch(':folderId/move')
   @UseGuards(JwtAuthGuard)
   async moveNote(

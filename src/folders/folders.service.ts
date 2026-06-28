@@ -77,4 +77,24 @@ export class FoldersService {
 
     return this.notesRepository.save(note);
   }
+
+  async getFolderNotes(folderId: number, userId: number) {
+    const folder = await this.foldersRepository.findOne({
+      where: {
+        id: folderId,
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        notes: true,
+      },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    return folder;
+  }
 }

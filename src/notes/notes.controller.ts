@@ -19,6 +19,7 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiResponseDto } from 'src/common/dto/api-response.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { FilterNoteDto } from './dto/filter-note.dto';
+import { BulkNoteDto } from './dto/bulk-note.dto';
 
 @ApiBearerAuth()
 @Controller({
@@ -139,6 +140,17 @@ export class NotesController {
     req,
   ) {
     return this.notesService.toggleFavorite(id, req.user.id);
+  }
+
+  @Patch('bulk/archive')
+  @UseGuards(JwtAuthGuard)
+  async archiveMultiple(@Body() bulkNoteDto: BulkNoteDto, @Request() req) {
+    const notes = await this.notesService.archiveMultipleNotes(
+      bulkNoteDto.noteIds,
+      req.user.id,
+    );
+
+    return new ApiResponseDto('Notes archived successfully', notes);
   }
 
   @Patch(':id/archive')

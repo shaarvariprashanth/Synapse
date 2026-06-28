@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike, IsNull, Not } from 'typeorm';
+import { Repository, ILike, IsNull, Not, In } from 'typeorm';
 import { Note } from './notes.entity';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -207,5 +207,24 @@ export class NotesService {
     query.orderBy(`note.${sortBy}`, order);
 
     return query.getMany();
+  }
+
+  async archiveMultipleNotes(noteIds: number[], userId: number) {
+    const notes = await this.notesRepository.find({
+      where: {
+        id: In(noteIds),
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    for (const note of notes) {
+      note.isArchived = true;
+    }
+
+    await this.notesRepository.save(notes);
+
+    return notes;
   }
 }

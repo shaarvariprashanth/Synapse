@@ -5,6 +5,7 @@ import { Note } from './notes.entity';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { UsersService } from '../users/users.service';
+import { FilterNoteDto } from './dto/filter-note.dto';
 
 @Injectable()
 export class NotesService {
@@ -166,5 +167,39 @@ export class NotesService {
         updatedAt: 'DESC',
       },
     });
+  }
+
+  async filterNotes(userId: number, filters: FilterNoteDto) {
+    const query = this.notesRepository.createQueryBuilder('note');
+
+    query.where('note.userId = :userId', {
+      userId,
+    });
+
+    if (filters.favorite) {
+      query.andWhere('note.isFavorite = :favorite', {
+        favorite: filters.favorite === 'true',
+      });
+    }
+
+    if (filters.archived) {
+      query.andWhere('note.isArchived = :archived', {
+        archived: filters.archived === 'true',
+      });
+    }
+
+    if (filters.folderId) {
+      query.andWhere('note.folderId = :folderId', {
+        folderId: Number(filters.folderId),
+      });
+    }
+
+    if (filters.tag) {
+      query.andWhere(':tag = ANY(note.tags)', {
+        tag: filters.tag,
+      });
+    }
+
+    return query.orderBy('note.updatedAt', 'DESC').getMany();
   }
 }

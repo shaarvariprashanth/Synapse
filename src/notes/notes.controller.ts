@@ -18,6 +18,7 @@ import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiResponseDto } from 'src/common/dto/api-response.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { FilterNoteDto } from './dto/filter-note.dto';
 
 @ApiBearerAuth()
 @Controller({
@@ -80,6 +81,14 @@ export class NotesController {
     const notes = await this.notesService.getArchivedNotes(req.user.id);
 
     return new ApiResponseDto('Archived notes retrieved successfully', notes);
+  }
+
+  @Get('filter')
+  @UseGuards(JwtAuthGuard)
+  async filterNotes(@Query() filters: FilterNoteDto, @Request() req) {
+    const notes = await this.notesService.filterNotes(req.user.id, filters);
+
+    return new ApiResponseDto('Notes filtered successfully', notes);
   }
 
   @Post()

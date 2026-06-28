@@ -47,7 +47,7 @@ export class FoldersService {
       order: {
         name: 'ASC',
       },
-     });
+    });
 
     return folders.map((folder) => ({
       id: folder.id,
@@ -57,27 +57,13 @@ export class FoldersService {
   }
 
   async moveNote(folderId: number, noteId: number, userId: number) {
-    const folder = await this.foldersRepository.findOne({
-      where: {
-        id: folderId,
-        user: {
-          id: userId,
-        },
-      },
-    });
+    const folder = await this.findUserFolder(folderId, userId);
 
     if (!folder) {
       throw new NotFoundException('Folder not found');
     }
 
-    const note = await this.notesRepository.findOne({
-      where: {
-        id: noteId,
-        user: {
-          id: userId,
-        },
-      },
-    });
+    const note = await this.findUserNote(noteId, userId);
 
     if (!note) {
       throw new NotFoundException('Note not found');
@@ -89,23 +75,7 @@ export class FoldersService {
   }
 
   async getFolderNotes(folderId: number, userId: number) {
-    const folder = await this.foldersRepository.findOne({
-      where: {
-        id: folderId,
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        notes: true,
-      },
-    });
-
-    if (!folder) {
-      throw new NotFoundException('Folder not found');
-    }
-
-    return folder;
+    return this.findUserFolder(folderId, userId, true);
   }
 
   async renameFolder(
@@ -113,14 +83,7 @@ export class FoldersService {
     userId: number,
     updateFolderDto: UpdateFolderDto,
   ) {
-    const folder = await this.foldersRepository.findOne({
-      where: {
-        id: folderId,
-        user: {
-          id: userId,
-        },
-      },
-    });
+    const folder = await this.findUserFolder(folderId, userId);
 
     if (!folder) {
       throw new NotFoundException('Folder not found');
@@ -132,17 +95,7 @@ export class FoldersService {
   }
 
   async removeNoteFromFolder(noteId: number, userId: number) {
-    const note = await this.notesRepository.findOne({
-      where: {
-        id: noteId,
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        folder: true,
-      },
-    });
+    const note = await this.findUserNote(noteId, userId);
 
     if (!note) {
       throw new NotFoundException('Note not found');
@@ -154,17 +107,7 @@ export class FoldersService {
   }
 
   async deleteFolder(folderId: number, userId: number) {
-    const folder = await this.foldersRepository.findOne({
-      where: {
-        id: folderId,
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        notes: true,
-      },
-    });
+    const folder = await this.findUserFolder(folderId, userId, true);
 
     if (!folder) {
       throw new NotFoundException('Folder not found');
@@ -180,5 +123,48 @@ export class FoldersService {
     return {
       message: 'Folder deleted successfully',
     };
+  }
+
+  private async findUserFolder(
+    folderId: number,
+    userId: number,
+    loadNotes = false,
+  ) {
+    const folder = await this.foldersRepository.findOne({
+      where: {
+        id: folderId,
+        user: {
+          id: userId,
+        },
+      },
+      relations: loadNotes
+        ? {
+            notes: true,
+          }
+        : {},
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    return folder;
+  }
+
+  private async findUserNote(noteId: number, userId: number) {
+    const note = await this.notesRepository.findOne({
+      where: {
+        id: noteId,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
+
+    return note;
   }
 }

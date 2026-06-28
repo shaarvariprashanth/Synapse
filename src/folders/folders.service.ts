@@ -35,16 +35,25 @@ export class FoldersService {
   }
 
   async getFolders(userId: number) {
-    return this.foldersRepository.find({
+    const folders = await this.foldersRepository.find({
       where: {
         user: {
           id: userId,
         },
       },
+      relations: {
+        notes: true,
+      },
       order: {
         name: 'ASC',
       },
-    });
+     });
+
+    return folders.map((folder) => ({
+      id: folder.id,
+      name: folder.name,
+      noteCount: folder.notes.length,
+    }));
   }
 
   async moveNote(folderId: number, noteId: number, userId: number) {
@@ -142,5 +151,34 @@ export class FoldersService {
     note.folder = null;
 
     return this.notesRepository.save(note);
+  }
+
+  async deleteFolder(folderId: number, userId: number) {
+    const folder = await this.foldersRepository.findOne({
+      where: {
+        id: folderId,
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        notes: true,
+      },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    for (const note of folder.notes) {
+      note.folder = null;
+      await this.notesRepository.save(note);
+    }
+
+    await this.foldersRepository.delete(folderId);
+
+    return {
+      message: 'Folder deleted successfully',
+    };
   }
 }

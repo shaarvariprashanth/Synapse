@@ -8,6 +8,7 @@ import {
   Patch,
   Param,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { FoldersService } from './folders.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
@@ -71,5 +72,11 @@ export class FoldersController {
     @Request() req,
   ) {
     return this.foldersService.removeNoteFromFolder(noteId, req.user.id);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async deleteFolder(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.foldersService.deleteFolder(id, req.user.id);
   }
 }

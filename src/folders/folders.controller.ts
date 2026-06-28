@@ -5,10 +5,14 @@ import {
   UseGuards,
   Request,
   Get,
+  Patch,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FoldersService } from './folders.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { MoveNoteDto } from './dto/move-note.dto';
 
 @Controller({
   path: 'folders',
@@ -27,5 +31,19 @@ export class FoldersController {
   @UseGuards(JwtAuthGuard)
   async getFolders(@Request() req) {
     return this.foldersService.getFolders(req.user.id);
+  }
+
+  @Patch(':folderId/move')
+  @UseGuards(JwtAuthGuard)
+  async moveNote(
+    @Param('folderId', ParseIntPipe) folderId: number,
+    @Body() moveNoteDto: MoveNoteDto,
+    @Request() req,
+  ) {
+    return this.foldersService.moveNote(
+      folderId,
+      moveNoteDto.noteId,
+      req.user.id,
+    );
   }
 }

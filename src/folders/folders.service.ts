@@ -4,12 +4,16 @@ import { Folder } from './folders.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateFolderDto } from './dto/create-folder.dto';
+import { Note } from 'src/notes/notes.entity';
 
 @Injectable()
 export class FoldersService {
   constructor(
     @InjectRepository(Folder)
     private foldersRepository: Repository<Folder>,
+
+    @InjectRepository(Note)
+    private notesRepository: Repository<Note>,
 
     private usersService: UsersService,
   ) {}
@@ -40,5 +44,37 @@ export class FoldersService {
         name: 'ASC',
       },
     });
+  }
+
+  async moveNote(folderId: number, noteId: number, userId: number) {
+    const folder = await this.foldersRepository.findOne({
+      where: {
+        id: folderId,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    const note = await this.notesRepository.findOne({
+      where: {
+        id: noteId,
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
+
+    note.folder = folder;
+
+    return this.notesRepository.save(note);
   }
 }

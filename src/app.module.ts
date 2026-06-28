@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { validationSchema } from './config/env.validation';
 import { NotesModule } from './notes/notes.module';
+import { FoldersModule } from './folders/folders.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { NotesModule } from './notes/notes.module';
       }),
     }),
     NotesModule,
+    FoldersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

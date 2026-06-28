@@ -8,6 +8,7 @@ import {
   DeleteDateColumn,
   ManyToOne,
 } from 'typeorm';
+import { Folder } from '../folders/folders.entity';
 
 @Entity()
 export class Note {
@@ -37,4 +38,9 @@ export class Note {
     default: [],
   })
   tags!: string[];
+
+  @ManyToOne(() => Folder, (folder) => folder.notes, {
+    nullable: true,
+  })
+  folder?: Folder;
 }

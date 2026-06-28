@@ -130,4 +130,18 @@ export class NotesService {
 
     return this.notesRepository.save(note);
   }
+
+  async getFavoriteNotes(userId: number) {
+    return this.notesRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+        isFavorite: true,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+  }
 }

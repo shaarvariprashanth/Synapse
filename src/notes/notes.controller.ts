@@ -63,6 +63,17 @@ export class NotesController {
     return this.notesService.getDeletedNotes(req.user.id);
   }
 
+  @Get('favorites')
+  @UseGuards(JwtAuthGuard)
+  async getFavoriteNotes(@Request() req) {
+    const favorites = await this.notesService.getFavoriteNotes(req.user.id);
+
+    return new ApiResponseDto(
+      'Favorite notes retrieved successfully',
+      favorites,
+    );
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Body() createNoteDto: CreateNoteDto, @Request() req) {

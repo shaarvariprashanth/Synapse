@@ -74,6 +74,14 @@ export class NotesController {
     );
   }
 
+  @Get('archived')
+  @UseGuards(JwtAuthGuard)
+  async getArchivedNotes(@Request() req) {
+    const notes = await this.notesService.getArchivedNotes(req.user.id);
+
+    return new ApiResponseDto('Archived notes retrieved successfully', notes);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Body() createNoteDto: CreateNoteDto, @Request() req) {
@@ -122,6 +130,20 @@ export class NotesController {
     req,
   ) {
     return this.notesService.toggleFavorite(id, req.user.id);
+  }
+
+  @Patch(':id/archive')
+  @UseGuards(JwtAuthGuard)
+  async toggleArchive(
+    @Param('id', ParseIntPipe)
+    id: number,
+
+    @Request()
+    req,
+  ) {
+    const note = await this.notesService.toggleArchive(id, req.user.id);
+
+    return new ApiResponseDto('Archive status updated successfully', note);
   }
 
   @Delete(':id')

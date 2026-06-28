@@ -20,6 +20,7 @@ export class NotesService {
         user: {
           id: userId,
         },
+        isArchived: false,
       },
 
       skip: (page - 1) * limit,
@@ -138,6 +139,28 @@ export class NotesService {
           id: userId,
         },
         isFavorite: true,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+  }
+
+  async toggleArchive(noteId: number, userId: number) {
+    const note = await this.findUserNote(noteId, userId);
+
+    note.isArchived = !note.isArchived;
+
+    return this.notesRepository.save(note);
+  }
+
+  async getArchivedNotes(userId: number) {
+    return this.notesRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+        isArchived: true,
       },
       order: {
         updatedAt: 'DESC',

@@ -48,4 +48,9 @@ export class Note {
     default: false,
   })
   isFavorite!: boolean;
+
+  @Column({
+    default: false,
+  })
+  isArchived!: boolean;
 }

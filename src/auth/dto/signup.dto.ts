@@ -7,6 +7,7 @@ export class SignUpDto {
   })
   @IsNotEmpty()
   name!: string;
+
   @ApiProperty({
     example: 'shaarvari@test.com',
   })

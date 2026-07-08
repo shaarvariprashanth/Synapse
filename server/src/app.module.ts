@@ -23,18 +23,14 @@ import { FoldersModule } from './folders/folders.module';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
 
-        host: configService.get<string>('DB_HOST'),
+        url: configService.getOrThrow<string>('DATABASE_URL'),
 
-        port: configService.get<number>('DB_PORT'),
-
-        username: configService.get<string>('DB_USERNAME'),
-
-        password: configService.get<string>('DB_PASSWORD'),
-
-        database: configService.get<string>('DB_NAME'),
+        ssl: {
+          rejectUnauthorized: false,
+        },
 
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false, // Set to false in production to avoid data loss
       }),
     }),
     NotesModule,
